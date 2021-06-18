@@ -1,11 +1,15 @@
-import requests, multiprocessing, json
+import requests, multiprocessing, json, os 
 
 TAGS = "rating:explicit score:>600"
-LIMIT = "100"
+LIMIT = "100" # Effectively the number of concurrent downloads. Max is 100.
 STARTING_PAGE = 0
 
 def downloader(file_url):
-    pass
+    filename = file_url.split("/")[-1]
+    print(filename)
+    if not os.path.exists(filename):
+        r = requests.get(file_url)
+        open(filename, 'wb').write(r.content)
 
 page = STARTING_PAGE
 while True:
@@ -14,12 +18,22 @@ while True:
     parsed_req = json.loads(req_text)
     if len(parsed_req) == 0:
         break
+
+    # Create/change into directory
+    if os.path.exists(TAGS):
+        os.chdir(TAGS)
+    else:
+        os.mkdir(TAGS)
+        os.chdir(TAGS)
+    
+    # Creating Jobs
     jobs = []
     for image in parsed_req:
-        file_url = image["jpeg_url"]
+        file_url = image["file_url"]
         proc = multiprocessing.Process(target=downloader, args=(file_url,))
         proc.start()
         jobs.append(proc)
+        break
     for job in jobs:
         job.join()
         job.close()
