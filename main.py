@@ -11,11 +11,11 @@ def downloader(file_url):
         open(filename, 'wb').write(r.content)
 
 # Create/change into directory
-if os.path.exists("a"):
-    os.chdir("a")
+if os.path.exists(TAGS):
+    os.chdir(TAGS)
 else:
-    os.mkdir("a")
-    os.chdir("a")
+    os.mkdir(TAGS)
+    os.chdir(TAGS)
 
 
 page = STARTING_PAGE
